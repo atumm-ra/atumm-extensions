@@ -1,0 +1,29 @@
+[project]
+name = "atumm-extensions"
+version = "0.1.0"
+description = "3rd-party extensions"
+authors = [
+    {name = "Omars", email = "omar@atumm.org"},
+]
+dependencies = [
+    "pydantic>=1.10,<3.0",
+    "atumm-core @ git+https://github.com/atumm-ra/atumm-core.git@dev",
+]
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+3rdparty = [
+    "classy-fastapi>=0.4.0",
+    "fastapi-jwt-auth>=0.5.0",
+    "injector>=0.21.0",
+    "motor>=3.3.1",
+]
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["atumm"]
