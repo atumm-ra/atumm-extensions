@@ -1,19 +1,20 @@
 from typing import Optional, Tuple
 
 import jwt
+from atumm.extensions.fastapi.schemas import CurrentUser
 from starlette.authentication import AuthenticationBackend
 from starlette.middleware.authentication import (
     AuthenticationMiddleware as BaseAuthenticationMiddleware,
 )
 from starlette.requests import HTTPConnection
 
-from thisapp.config import get_config
-from thisapp.fastapi.schemas import CurrentUser
-
-config = get_config()
-
 
 class AuthBackend(AuthenticationBackend):
+    def __init__(self, jwt_secret_key: str, jwt_algorithm: str) -> None:
+        super().__init__()
+        self.jwt_secret_key = jwt_secret_key
+        self.jwt_algorithm = jwt_algorithm
+
     async def authenticate(
         self, conn: HTTPConnection
     ) -> Tuple[bool, Optional[CurrentUser]]:
@@ -35,8 +36,8 @@ class AuthBackend(AuthenticationBackend):
         try:
             payload = jwt.decode(
                 credentials,
-                config.JWT_SECRET_KEY,
-                algorithms=[config.JWT_ALGORITHM],
+                self.jwt_secret_key,
+                algorithms=[self.jwt_algorithm],
             )
             current_user.email = payload.get("sub")
             current_user.id = payload.get("user_id")

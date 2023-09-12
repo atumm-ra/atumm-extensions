@@ -1,5 +1,7 @@
-from injector import provider, singleton, Module
+from atumm.core.infra.config import Config
+from injector import Module, provider, singleton
 from motor.motor_asyncio import AsyncIOMotorClient
+
 
 class AsyncMotorClientProvider(Module):
     @provider

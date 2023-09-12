@@ -1,24 +1,24 @@
+from atumm.core.entrypoints.rest.responses import map_exception_to_response
+from atumm.core.exceptions import ErrorStatus, ExceptionDetail, RuntimeException
+from atumm.core.infra.config import Config
 from atumm.extensions.buti.keys import AtummContainerKeys
 from atumm.extensions.fastapi.base import ProductionWebApp
+from atumm.extensions.fastapi.middlewares import (
+    AuthBackend,
+    AuthenticationMiddleware,
+    ResponseLogMiddleware,
+)
 from buti import BootableComponent, ButiStore
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from pydantic import BaseModel
+from starlette.authentication import AuthenticationBackend
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-from atumm.core.entrypoints.rest.responses import map_exception_to_response
-
-from atumm.core.exceptions import ErrorStatus, ExceptionDetail, RuntimeException
-from atumm.core.infra.config import Config
-from atumm.extensions.fastapi.middlewares import (
-    AuthBackend,
-    AuthenticationMiddleware,
-    ResponseLogMiddleware,
-)
 
 
 class FastAPIComponent(BootableComponent):
@@ -26,10 +26,12 @@ class FastAPIComponent(BootableComponent):
         config: Config = store.get(AtummContainerKeys.config)
         app: FastAPI = ProductionWebApp(config).app
         store.set(AtummContainerKeys.app, app)
-        app.user_middleware = self.make_middlewares()
+        app.user_middleware = self.make_middlewares(
+            store.get(AtummContainerKeys.injector).get(AuthenticationBackend)
+        )
         self.register_exception_listeners(app)
 
-    def make_middlewares(self):
+    def make_middlewares(self, auth_backend: AuthenticationBackend):
         return [
             Middleware(
                 CORSMiddleware,
@@ -38,9 +40,10 @@ class FastAPIComponent(BootableComponent):
                 allow_methods=["*"],
                 allow_headers=["*"],
             ),
-            Middleware(AuthenticationMiddleware, backend=AuthBackend()),
+            Middleware(AuthenticationMiddleware, backend=auth_backend),
             Middleware(ResponseLogMiddleware),
         ]
+
     def register_exception_listeners(self, app):
         @app.exception_handler(RuntimeException)
         async def handle_runtime_exception(

@@ -1,4 +1,4 @@
-from atumm.core.config import Config
+from atumm.core.infra.config import Config
 from atumm.extensions.beanie import init_my_beanie
 from atumm.extensions.buti.keys import AtummContainerKeys
 from beanie import init_beanie
@@ -6,7 +6,6 @@ from buti import BootableComponent, ButiStore
 from fastapi import FastAPI
 from injector import Injector
 from motor.motor_asyncio import AsyncIOMotorClient
-
 
 
 class BeanieComponent(BootableComponent):

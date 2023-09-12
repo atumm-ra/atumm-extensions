@@ -7,7 +7,6 @@ authors = [
 ]
 dependencies = [
     "pydantic>=1.10,<3.0",
-    "atumm-core @ git+https://github.com/atumm-ra/atumm-core.git@dev",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
@@ -24,6 +23,3 @@ license = {text = "MIT"}
 [build-system]
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
-
-[tool.setuptools]
-py-modules = ["atumm"]

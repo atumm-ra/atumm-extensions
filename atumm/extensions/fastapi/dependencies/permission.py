@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import List, Type
 
-from fastapi import Request
-from fastapi.openapi.models import APIKey, APIKeyIn
-from fastapi.security.base import SecurityBase
-
 from atumm.core.exceptions import RuntimeException
 from atumm.services.user.domain.exceptions import UnauthorizedException
 from atumm.services.user.entrypoints.common.services import UserService
+from fastapi import Request
+from fastapi.openapi.models import APIKey, APIKeyIn
+from fastapi.security.base import SecurityBase
 
 
 class BasePermission(ABC):
