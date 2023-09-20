@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Callable
 
 import jwt
 from atumm.extensions.fastapi.schemas import CurrentUser
@@ -6,14 +6,16 @@ from starlette.authentication import AuthenticationBackend
 from starlette.middleware.authentication import (
     AuthenticationMiddleware as BaseAuthenticationMiddleware,
 )
-from starlette.requests import HTTPConnection
+from starlette.requests import HTTPConnection, Request
+from atumm.services.user.infra.auth.tokenizer import Tokenizer
+from injector import inject
+from atumm.core.exceptions import RuntimeException
 
 
 class AuthBackend(AuthenticationBackend):
-    def __init__(self, jwt_secret_key: str, jwt_algorithm: str) -> None:
-        super().__init__()
-        self.jwt_secret_key = jwt_secret_key
-        self.jwt_algorithm = jwt_algorithm
+    @inject
+    def __init__(self, tokenizer: Tokenizer) -> None:
+        self.tokenizer = tokenizer
 
     async def authenticate(
         self, conn: HTTPConnection
@@ -24,21 +26,17 @@ class AuthBackend(AuthenticationBackend):
             return False, current_user
 
         try:
-            scheme, credentials = authorization.split(" ")
+            scheme, access_token = authorization.split(" ")
             if scheme.lower() != "bearer":
                 return False, current_user
         except ValueError:
             return False, current_user
 
-        if not credentials:
+        if not access_token:
             return False, current_user
 
         try:
-            payload = jwt.decode(
-                credentials,
-                self.jwt_secret_key,
-                algorithms=[self.jwt_algorithm],
-            )
+            payload = self.tokenizer.decode(access_token, True)
             current_user.email = payload.get("sub")
             current_user.id = payload.get("user_id")
         except jwt.exceptions.PyJWTError:
@@ -46,6 +44,36 @@ class AuthBackend(AuthenticationBackend):
 
         return True, current_user
 
+    async def __call__(self, request: Request, call_next: Callable):
+        authorization: str = conn.headers.get("Authorization")
+        
+        if not authorization:
+            return self._resume(request, call_next)
+        
+        parts = authorization.split(" ")
+        if len(parts) != 2 or parts[0].lower() != "bearer":
+            return self._resume(request, call_next)
+        
+        access_token = parts[1]
+        if not access_token:
+            return self._resume(request, call_next)
+        
+        try:
+            payload = self.tokenizer.decode(access_token, True)
+            current_user = CurrentUser()
+            current_user.email = payload.get("sub")
+            current_user.id = payload.get("user_id")
+            request.user = current_user
+        except RuntimeException:
+            return self._resume(request, call_next)
+
+            
+    
+    async def _resume(self, request, call_next):
+        response = await call_next(request)
+        
+        return response
 
 class AuthenticationMiddleware(BaseAuthenticationMiddleware):
     pass
+
