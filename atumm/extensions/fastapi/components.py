@@ -1,6 +1,6 @@
 from atumm.core.entrypoints.rest.responses import map_exception_to_response
 from atumm.core.exceptions import ErrorStatus, ExceptionDetail, RuntimeException
-from atumm.core.infra.config import Config
+from atumm.atumm.extensions.config import Config
 from atumm.extensions.buti.keys import AtummContainerKeys
 from atumm.extensions.fastapi.base import ProductionWebApp
 from atumm.extensions.fastapi.middlewares import (
@@ -11,8 +11,6 @@ from atumm.extensions.fastapi.middlewares import (
 from buti import BootableComponent, ButiStore
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
-from fastapi_jwt_auth import AuthJWT
-from fastapi_jwt_auth.exceptions import AuthJWTException
 from pydantic import BaseModel
 from starlette.authentication import AuthenticationBackend
 from starlette.middleware import Middleware

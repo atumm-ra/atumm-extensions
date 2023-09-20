@@ -1,6 +1,6 @@
 from typing import List
 
-from atumm.core.infra.config import Config
+from atumm.atumm.extensions.config import Config
 from fastapi import FastAPI
 
 

@@ -1,4 +1,4 @@
-from atumm.core.infra.config import Config
+from atumm.atumm.extensions.config import Config
 from atumm.extensions.fastapi.middlewares.authentication import AuthBackend
 from injector import Module, provider, singleton
 from starlette.authentication import AuthenticationBackend
