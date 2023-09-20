@@ -6,7 +6,7 @@ authors = [
     {name = "Omars", email = "omar@atumm.org"},
 ]
 dependencies = [
-    "pydantic>=1.10,<3.0",
+    "pydantic>=2.3.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
