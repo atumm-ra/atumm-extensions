@@ -1,4 +1,4 @@
-from atumm.atumm.extensions.config import Config, configure
+from atumm.extensions.config import Config, configure
 from atumm.extensions.buti.keys import AtummContainerKeys
 from buti import BootableComponent, ButiStore
 
