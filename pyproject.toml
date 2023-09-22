@@ -7,18 +7,14 @@ authors = [
 ]
 dependencies = [
     "pydantic>=2.3.0",
+    "injector>=0.21.0",
+    "motor>=3.3.1",
+    "pyseto>=1.7.4",
+    "PyJWT>=2.8.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
 license = {text = "MIT"}
-
-[project.optional-dependencies]
-3rdparty = [
-    "classy-fastapi>=0.4.0",
-    "fastapi-jwt-auth>=0.5.0",
-    "injector>=0.21.0",
-    "motor>=3.3.1",
-]
 
 [build-system]
 requires = ["setuptools>=61", "wheel"]
