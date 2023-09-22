@@ -1,6 +1,6 @@
 from atumm.core.entrypoints.rest.responses import map_exception_to_response
 from atumm.core.exceptions import ErrorStatus, ExceptionDetail, RuntimeException
-from atumm.atumm.extensions.config import Config
+from atumm.extensions.config import Config
 from atumm.extensions.buti.keys import AtummContainerKeys
 from atumm.extensions.fastapi.base import ProductionWebApp
 from atumm.extensions.fastapi.middlewares import (
@@ -17,6 +17,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
+from atumm.extensions.di.resolver import DependencyResolver
 
 
 class FastAPIComponent(BootableComponent):
@@ -24,6 +25,10 @@ class FastAPIComponent(BootableComponent):
         config: Config = store.get(AtummContainerKeys.config)
         app: FastAPI = ProductionWebApp(config).app
         store.set(AtummContainerKeys.app, app)
+        
+        
+        DependencyResolver.set_resolver(store.get(AtummContainerKeys.injector))
+        
         app.user_middleware = self.make_middlewares(
             store.get(AtummContainerKeys.injector).get(AuthenticationBackend)
         )
@@ -50,21 +55,6 @@ class FastAPIComponent(BootableComponent):
             code, response = map_exception_to_response(exception)
             return JSONResponse(content=response.dict(), status_code=code)
 
-        @app.exception_handler(AuthJWTException)
-        async def on_auth_error(request: Request, exc: AuthJWTException):
-            status_code, message = 401, exc.message
-            status_code, response = map_exception_to_response(
-                RuntimeException(
-                    code=status_code,
-                    message=message,
-                    status=ErrorStatus.TOKEN_ERROR,
-                    details=[
-                        ExceptionDetail(type=exc.__class__.__name__, reason=message)
-                    ],
-                )
-            )
-            return JSONResponse(response.dict(), status_code=401)
-
         @app.exception_handler(RequestValidationError)
         async def validation_exception_handler(
             request: Request, exc: RequestValidationError
@@ -87,16 +77,3 @@ class FastAPIComponent(BootableComponent):
             code, response = map_exception_to_response(api_exception)
             return JSONResponse(response.dict(), status_code=code)
 
-
-class AuthJWTComponent(BootableComponent):
-    def boot(self, store: ButiStore) -> None:
-        config: Config = store.get(AtummContainerKeys.config)
-
-        class Settings(BaseModel):
-            authjwt_secret_key: str = config.JWT_SECRET_KEY
-            authjwt_algorithm: str = config.JWT_ALGORITHM
-
-        # callback to get your configuration
-        @AuthJWT.load_config
-        def get_jwt_config():
-            return Settings()
