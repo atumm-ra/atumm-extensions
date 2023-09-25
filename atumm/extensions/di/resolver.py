@@ -1,14 +1,15 @@
 from typing import Type, TypeVar
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class DependencyResolver:
     """
-    This is used to override the default Depends, as an injector instance will be 
+    This is used to override the default Depends, as an injector instance will be
     injected at runtime as a source for dependency resolution
     or Any Resolver that has Resolver.get(dependencyClass)
     """
+
     _resolver = None
 
     @classmethod
