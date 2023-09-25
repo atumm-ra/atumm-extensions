@@ -1,7 +1,8 @@
 from atumm.core.entrypoints.rest.responses import map_exception_to_response
 from atumm.core.exceptions import ErrorStatus, ExceptionDetail, RuntimeException
-from atumm.extensions.config import Config
 from atumm.extensions.buti.keys import AtummContainerKeys
+from atumm.extensions.config import Config
+from atumm.extensions.di.resolver import DependencyResolver
 from atumm.extensions.fastapi.base import ProductionWebApp
 from atumm.extensions.fastapi.middlewares import (
     AuthBackend,
@@ -11,27 +12,25 @@ from atumm.extensions.fastapi.middlewares import (
 from buti import BootableComponent, ButiStore
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel
+from injector import Injector
+from pydantic import BaseModel, ValidationError
 from starlette.authentication import AuthenticationBackend
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-from atumm.extensions.di.resolver import DependencyResolver
 
 
 class FastAPIComponent(BootableComponent):
     def boot(self, store: ButiStore) -> None:
         config: Config = store.get(AtummContainerKeys.config)
         app: FastAPI = ProductionWebApp(config).app
+        injector: Injector = store.get(AtummContainerKeys.injector)
         store.set(AtummContainerKeys.app, app)
-        
-        
-        DependencyResolver.set_resolver(store.get(AtummContainerKeys.injector))
-        
-        app.user_middleware = self.make_middlewares(
-            store.get(AtummContainerKeys.injector).get(AuthenticationBackend)
-        )
+
+        DependencyResolver.set_resolver(injector)
+
+        app.user_middleware = self.make_middlewares(injector.get(AuthenticationBackend))
         self.register_exception_listeners(app)
 
     def make_middlewares(self, auth_backend: AuthenticationBackend):
@@ -77,3 +76,30 @@ class FastAPIComponent(BootableComponent):
             code, response = map_exception_to_response(api_exception)
             return JSONResponse(response.dict(), status_code=code)
 
+        @app.exception_handler(ValidationError)
+        async def pydantic_validation_exception_handler(
+            request: Request, exc: ValidationError
+        ):
+            details = []
+            for error in exc.errors():
+                # Extract additional context from the error
+                ctx = error.get("ctx", {})
+                details.append(
+                    ExceptionDetail(
+                        type=ctx.get("type", error["type"]),
+                        reason=error["msg"],
+                        metadata={
+                            "location": ".".join(map(str, error["loc"])),
+                            "input_value": str(ctx.get("input_value", "N/A")),
+                            "input_type": str(ctx.get("input_type", "N/A")),
+                        },
+                    )
+                )
+            api_exception = RuntimeException(
+                code=400,
+                message="Validation error",
+                status=ErrorStatus.VALIDATION_ERROR,
+                details=details,
+            )
+            code, response = map_exception_to_response(api_exception)
+            return JSONResponse(response.dict(), status_code=code)
