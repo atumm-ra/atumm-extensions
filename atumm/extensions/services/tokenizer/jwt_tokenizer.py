@@ -3,8 +3,10 @@ from typing import Any, Mapping
 
 import jwt
 from atumm.extensions.services.tokenizer.base import BaseTokenizer
-from atumm.extensions.services.tokenizer.exceptions import DecodeTokenException,\
-    ExpiredTokenException
+from atumm.extensions.services.tokenizer.exceptions import (
+    DecodeTokenException,
+    ExpiredTokenException,
+)
 
 
 class JWTTokenizer(BaseTokenizer):
@@ -37,6 +39,6 @@ class JWTTokenizer(BaseTokenizer):
                 verify=True,
             )
         except jwt.exceptions.DecodeError:
-            raise DecodeTokenException  
+            raise DecodeTokenException
         except jwt.exceptions.ExpiredSignatureError:
             raise ExpiredTokenException

@@ -3,13 +3,13 @@ from typing import Callable, Optional, Tuple
 import jwt
 from atumm.core.exceptions import RuntimeException
 from atumm.extensions.fastapi.schemas import CurrentUser
+from atumm.extensions.services.tokenizer.base import BaseTokenizer
 from injector import inject
 from starlette.authentication import AuthenticationBackend
 from starlette.middleware.authentication import (
     AuthenticationMiddleware as BaseAuthenticationMiddleware,
 )
 from starlette.requests import HTTPConnection, Request
-from atumm.extensions.services.tokenizer.base import BaseTokenizer
 
 
 class AuthBackend(AuthenticationBackend):

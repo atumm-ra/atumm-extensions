@@ -1,8 +1,7 @@
-from atumm.core.exceptions import RuntimeException, ErrorStatus, ExceptionDetail
+from atumm.core.exceptions import ErrorStatus, ExceptionDetail, RuntimeException
 
 
 class DecodeTokenException(RuntimeException):
-
     def __init__(self):
         super().__init__(
             code=400,
@@ -17,7 +16,6 @@ class DecodeTokenException(RuntimeException):
 
 
 class ExpiredTokenException(RuntimeException):
-
     def __init__(self):
         super().__init__(
             code=400,

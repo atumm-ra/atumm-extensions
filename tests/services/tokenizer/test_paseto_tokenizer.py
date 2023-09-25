@@ -2,9 +2,11 @@ import time
 import unittest
 from datetime import datetime, timedelta
 
+from atumm.extensions.services.tokenizer.exceptions import (
+    DecodeTokenException,
+    ExpiredTokenException,
+)
 from atumm.extensions.services.tokenizer.paseto_tokenizer import PasetoTokenizer
-from atumm.extensions.services.tokenizer.exceptions import ExpiredTokenException,\
-    DecodeTokenException
 
 
 class TestPasetoTokenizer(unittest.TestCase):

@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm.session import sessionmaker
 
 
 class AsyncSessionFactory:
