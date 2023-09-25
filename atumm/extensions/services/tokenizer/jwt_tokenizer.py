@@ -1,13 +1,16 @@
-from atumm.services.user.domain.exceptions import DecodeTokenException,\
-    ExpiredTokenException
-from atumm.extensions.tokenizer.base import BaseTokenizer
-from typing import Mapping, Any
-import jwt
 from datetime import datetime, timedelta
+from typing import Any, Mapping
+
+import jwt
+from atumm.extensions.services.tokenizer.base import BaseTokenizer
+from atumm.extensions.services.tokenizer.exceptions import DecodeTokenException,\
+    ExpiredTokenException
+
 
 class JWTTokenizer(BaseTokenizer):
-
-    def __init__(self, secret_key: str, expire_period: int, jwt_algorithm: str = "HS256"):
+    def __init__(
+        self, secret_key: str, expire_period: int, jwt_algorithm: str = "HS256"
+    ):
         self.secret_key = secret_key
         self.expire_period = expire_period
         self.jwt_algorithm = jwt_algorithm
@@ -34,8 +37,6 @@ class JWTTokenizer(BaseTokenizer):
                 verify=True,
             )
         except jwt.exceptions.DecodeError:
-            raise DecodeTokenException
+            raise DecodeTokenException  
         except jwt.exceptions.ExpiredSignatureError:
             raise ExpiredTokenException
-
-

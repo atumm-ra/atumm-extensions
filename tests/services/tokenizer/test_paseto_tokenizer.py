@@ -2,19 +2,16 @@ import time
 import unittest
 from datetime import datetime, timedelta
 
-from atumm.extensions.services.tokenizer.jwt_tokenizer import JWTTokenizer
+from atumm.extensions.services.tokenizer.paseto_tokenizer import PasetoTokenizer
 from atumm.extensions.services.tokenizer.exceptions import ExpiredTokenException,\
     DecodeTokenException
 
 
-class TestJWTTokenizer(unittest.TestCase):
+class TestPasetoTokenizer(unittest.TestCase):
     def setUp(self):
         self.secret_key = "test_secret_key"
         self.expire_period = 1
-        self.jwt_algorithm = "HS256"
-        self.tokenizer = JWTTokenizer(
-            self.secret_key, self.expire_period, self.jwt_algorithm
-        )
+        self.tokenizer = PasetoTokenizer(self.secret_key, self.expire_period)
 
     def test_encode(self):
         payload = {"sub": "test@example.com", "user_id": 123}
@@ -40,3 +37,7 @@ class TestJWTTokenizer(unittest.TestCase):
         time.sleep(2)
         with self.assertRaises(ExpiredTokenException):
             self.tokenizer.decode(token)
+
+
+if __name__ == "__main__":
+    unittest.main()
