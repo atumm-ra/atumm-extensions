@@ -1,15 +1,15 @@
-from typing import Optional, Tuple, Callable
+from typing import Callable, Optional, Tuple
 
 import jwt
+from atumm.core.exceptions import RuntimeException
 from atumm.extensions.fastapi.schemas import CurrentUser
+from atumm.services.user.infra.auth.tokenizer import Tokenizer
+from injector import inject
 from starlette.authentication import AuthenticationBackend
 from starlette.middleware.authentication import (
     AuthenticationMiddleware as BaseAuthenticationMiddleware,
 )
 from starlette.requests import HTTPConnection, Request
-from atumm.services.user.infra.auth.tokenizer import Tokenizer
-from injector import inject
-from atumm.core.exceptions import RuntimeException
 
 
 class AuthBackend(AuthenticationBackend):
@@ -44,20 +44,25 @@ class AuthBackend(AuthenticationBackend):
 
         return True, current_user
 
+    async def _resume(self, request, call_next):
+        response = await call_next(request)
+
+        return response
+
     async def __call__(self, request: Request, call_next: Callable):
-        authorization: str = conn.headers.get("Authorization")
-        
+        authorization: str = request.headers.get("Authorization")
+
         if not authorization:
             return self._resume(request, call_next)
-        
+
         parts = authorization.split(" ")
         if len(parts) != 2 or parts[0].lower() != "bearer":
             return self._resume(request, call_next)
-        
+
         access_token = parts[1]
         if not access_token:
             return self._resume(request, call_next)
-        
+
         try:
             payload = self.tokenizer.decode(access_token, True)
             current_user = CurrentUser()
@@ -67,13 +72,6 @@ class AuthBackend(AuthenticationBackend):
         except RuntimeException:
             return self._resume(request, call_next)
 
-            
-    
-    async def _resume(self, request, call_next):
-        response = await call_next(request)
-        
-        return response
 
 class AuthenticationMiddleware(BaseAuthenticationMiddleware):
     pass
-
