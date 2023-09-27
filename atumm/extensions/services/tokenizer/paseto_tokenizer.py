@@ -10,7 +10,6 @@ from atumm.extensions.services.tokenizer.exceptions import (
     ExpiredTokenException,
 )
 from pyseto.key import Key
-from pyseto.versions.v4 import V4Local
 
 
 class PasetoTokenizer(BaseTokenizer):
@@ -39,5 +38,5 @@ class PasetoTokenizer(BaseTokenizer):
 
             return payload
 
-        except ValueError as e:
+        except ValueError:
             raise DecodeTokenException

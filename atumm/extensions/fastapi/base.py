@@ -1,5 +1,3 @@
-from typing import List
-
 from atumm.extensions.config import Config
 from fastapi import FastAPI
 

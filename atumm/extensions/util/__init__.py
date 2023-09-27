@@ -1,5 +1,5 @@
 import warnings
-from typing import Callable, List
+from typing import Callable
 
 
 def deprecated(msg: str) -> Callable:

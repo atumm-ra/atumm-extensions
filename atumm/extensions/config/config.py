@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import UserDict
-from typing import Any
 
 from pydantic.config import ConfigDict
 from pydantic_settings import BaseSettings
@@ -20,7 +19,6 @@ class Configure:
 
     def build_configuration_class(self) -> Config:
         annotations = {}
-        defaults = {}
         for config_cls in self.configurations.values():
             for field_name, field_definition in config_cls.__fields__.items():
                 annotations[field_name] = field_definition

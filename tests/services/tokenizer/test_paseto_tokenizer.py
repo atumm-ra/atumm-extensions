@@ -1,6 +1,5 @@
 import time
 import unittest
-from datetime import datetime, timedelta
 
 from atumm.extensions.services.tokenizer.exceptions import (
     DecodeTokenException,

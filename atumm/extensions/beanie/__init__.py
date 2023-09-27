@@ -2,7 +2,6 @@ from builtins import BaseException
 from typing import Any, List, Optional, Type
 
 from atumm.core.types import AsyncContextManager
-from atumm.services.user.dataproviders.beanie.models import User
 from beanie import init_beanie
 from beanie.odm.documents import Document
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase

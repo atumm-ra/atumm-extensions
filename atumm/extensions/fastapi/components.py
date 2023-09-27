@@ -5,7 +5,6 @@ from atumm.extensions.config import Config
 from atumm.extensions.di.resolver import DependencyResolver
 from atumm.extensions.fastapi.base import ProductionWebApp
 from atumm.extensions.fastapi.middlewares import (
-    AuthBackend,
     AuthenticationMiddleware,
     ResponseLogMiddleware,
 )
@@ -13,7 +12,7 @@ from buti import BootableComponent, ButiStore
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from injector import Injector
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 from starlette.authentication import AuthenticationBackend
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
