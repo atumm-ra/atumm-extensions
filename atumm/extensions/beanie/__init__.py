@@ -5,6 +5,8 @@ from atumm.core.types import AsyncContextManager
 from beanie import init_beanie
 from beanie.odm.documents import Document
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from .transformer import BeanieTransformer
+from .di import AsyncMotorClientProvider
 
 
 async def init_my_beanie(
@@ -36,3 +38,11 @@ class BeanieLifespan(AsyncContextManager):
         traceback: Any,
     ) -> None:
         await self.beanie_client.close()
+
+
+__all__ = [
+    'BeanieTransformer'
+    'AsyncMotorClientProvider',
+    'BeanieLifespan',
+    'init_my_beanie',
+]
