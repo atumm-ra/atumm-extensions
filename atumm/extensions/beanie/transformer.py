@@ -8,12 +8,12 @@ BeanieEntity = TypeVar("BeanieEntity", bound=Document)
 
 
 class BeanieTransformer:
-    domain_model: Type[DomainEntity]
-    beanie_model: Type[BeanieEntity]
+    domain_entity: Type[DomainEntity]
+    beanie_entity: Type[BeanieEntity]
 
     def to_domain_entity(self, beanie_entity: BeanieEntity) -> DomainEntity:
         data = beanie_entity.dict()
-        return self.domain_model(**data)
+        return self.domain_entity(**data)
 
     def to_beanie_entity(self, domain_entity: DomainEntity) -> BeanieEntity:
-        return self.beanie_model(**domain_entity.dict())
+        return self.beanie_entity(**domain_entity.dict())

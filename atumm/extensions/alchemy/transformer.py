@@ -8,11 +8,11 @@ AlchemyEntity = TypeVar("AlchemyEntity", bound=Base)
 
 
 class AlchemyTransformer:
-    domain_model: Type[DomainEntity]
-    alchemy_model: Type[AlchemyEntity]
+    domain_entity: Type[DomainEntity]
+    alchemy_entity: Type[AlchemyEntity]
 
     def to_domain_entity(self, alchemy_entity: AlchemyEntity) -> DomainEntity:
-        return self.domain_model(**alchemy_entity.__dict__)
+        return self.domain_entity(**alchemy_entity.__dict__)
 
     def to_alchemy_entity(self, domain_entity: DomainEntity) -> AlchemyEntity:
-        return self.alchemy_model(**domain_entity.dict())
+        return self.alchemy_entity(**domain_entity.dict())
