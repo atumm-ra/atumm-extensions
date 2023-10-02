@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings
 
 
 class Config(BaseSettings):
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(extra="ignore")
 
     @classmethod
     def create_from_env_file(cls, filename: str = ".env") -> Config:
